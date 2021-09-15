@@ -1,0 +1,2 @@
+# CoolScope
+Telescope fan controller
