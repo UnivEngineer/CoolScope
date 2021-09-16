@@ -1,13 +1,19 @@
 # CoolScope
 Telescope fan controller
 
-CoolScope v 1.0 is a diy 2-channel fan controller based on Arduino Nano. It is used to cool down (thermostabilize) the 12 inch Meade LX200 telescope. It is assembed in a 3D pronted case and mounted on the back on the scope. Device feature 2 channels for 12V PWM fans, 4 temperature sensors (DS18B20): mounted on the scope's primary mirror, inside the scope's tube, inside device's case, and one external sensor connected via 3.5 mm jack, and 1602 LCD/OLED display to show stats and menu. The device is powered by 12V external power source, and draws up to 400 mA (depending on used fans).
+CoolScope v 1.0 is a diy 2-channel fan controller based on Arduino Nano. It is used to cool down (thermostabilize) the 12 inch Meade LX200 telescope, but can be adapted to any other scope. It is assembed in a 3D printed case and mounted on the back on the scope. The device features 2 channels for 12V PWM fans, 4 temperature sensors DS18B20 (mounted on the scope's primary mirror, inside the scope's tube, inside device's case, and one external sensor connected via 3.5 mm jack), and 1602 LCD/OLED display to show stats and menu. The device is powered by 12V external power source, and draws up to 400 mA (depending on used fans).
 
 The project consists of three parts:
 
 Telescope_fans - Arduino sketch source code.
-PCB - KiCad files for circut schematcis and PCB.
+PCB - KiCad files of circut schematcis and PCB.
 Case - SolidWorks and STL files of 3D model of the case.
+
+The device can use any 80 mm 1602 LCD module with parallel interface (4 data lines). The best choise for astronomy accessoty is a module with red symbols on a black background. Even better choise is a red Winstar 1602 OLED (WEH001602A), fully compatible electrically with LCD modules. The device supports those too, you have to switch a jumper on the PCB to tell the software which type of display module is used.
+
+The Arduino Nano can either be soldered to the main PCB through its PLS pins, or installed in a DIP socket, but you have to cut and solder pins directly to Nano, otherwise it may not fit under the display module.
+
+The device has a wrong power polarity protection circut, and power voltage monitor, which can be used to control telescope's battery charge, and also used by software to auto-save settings to EEPROM memory.
 
 ----------------------------------------------------------------------------------
 
@@ -15,7 +21,8 @@ Short usage manual (v 1.0)
 
 Device has 4 buttons: [menu], [<], [>], [ok].
 
-Once powered up, you will see an info screen. It displays current temperature of variaous sensors, fans speed and duty, and additional info. You may scroll several info screens by pressing [<] [>] buttons. Legend:
+Once powered up, you will see an info screen. It displays current temperatures reported by sensors, fans speed and duty, and some additional info. You may scroll several info screens by pressing [<] and [>] buttons. Legend:
+
 A - ambient temperature, i.e. sensor inside the device.
 E - expternal temperature, i.e. external sensor connected via jack.
 M - mirror temperature.
@@ -23,7 +30,7 @@ T - tube temperature (air inside the tube).
 F - front fans speed/duty.
 R - rear fans speed/duty.
 
-Pressing [menu] or [ok] button will bring up settings. Press buttons [<] or [>] to scroll throug optoins or increase/decrease values, [ok] to enter sub-level, [menu] to return back to upper level. The settings menu heirarchy is the following:
+Pressing [menu] or [ok] button will bring up the settings. Press buttons [<] or [>] to scroll throug optoins or increase/decrease values, [ok] to enter sub-level, [menu] to return back to upper level. The settings menu heirarchy is the following:
 
 Settings
 - Cooling
@@ -48,3 +55,6 @@ Settings
   - Fan stuck alarm [values are "off", "on"]
   - About
 
+Depending on "Dispaly->Timeout" settings, the dispaly may turn off after a while (if LCD is used, only backlight will turn off). To turn on it back, simply press any button.
+
+The device will run fans at "Cooling->Cooling speed" duty until specified delta T is reached. After that, it will either stop fans or keep them spinning at "Cooling->Keeping speed". Typically, you need the primary mirror of your scope to be in thermal equilibrium with outside air, so the "Target delta T pair" must be set to "Mirror and External", and external DS18B20 sensor plugged into the 3.5 mm jack. The "Ambient" sensor is mounted inside the device, thus may report higher temperatures because of observer breathing. For a balcony observations, the "Mirror and Tube" pair may give better results, because air at balcony is always warmer than the outside air anyway.
