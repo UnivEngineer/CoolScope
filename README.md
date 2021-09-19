@@ -21,16 +21,16 @@ Short usage manual (v 1.1)
 
 Device has 4 buttons: [menu], [<], [>], [ok].
 
-Once powered up, you will see the info screen. It displays current temperatures reported by sensors, fans speed and duty, and some additional info. You may scroll through info screen modes by pressing [<] and [>] buttons. Legend:
+Once powered up, you will see the info screen. It displays current temperatures reported by sensors, fans speed and duty, and power supply voltage. You may scroll through info screen modes by pressing [<] and [>] buttons. Legend:
 
-A - ambient temperature, i.e. sensor inside the device,
-E - expternal temperature, i.e. external sensor connected via jack,
-M - mirror temperature,
-T - tube temperature (air inside the tube),
+A - ambient temperature, i.e. sensor inside the device
+E - expternal temperature, i.e. external sensor connected via jack
+M - mirror temperature
+T - tube temperature (air inside the tube)
 [] - [battery symbol] - power supply voltage
-* - [rotating fan symbol] - max of (front, rear) fans duty/RPM,
-F* - front fan duty/RPM,
-R* - rear fan duty/RPM,
+* - [rotating fan symbol] - max of (front, rear) fans duty/RPM
+F* - front fan duty/RPM
+R* - rear fan duty/RPM
 
 Pressing [menu] or [ok] button will bring up the settings. Press buttons [<] or [>] to scroll throug optoins or increase/decrease values, [ok] to enter sub-level, [menu] to return back to upper level. The settings menu heirarchy is the following:
 
