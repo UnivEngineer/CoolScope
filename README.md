@@ -27,10 +27,10 @@ Once powered up, you will see the info screen. It displays current temperatures 
 - E - expternal temperature, i.e. external sensor connected via jack
 - M - mirror temperature
 - T - tube temperature (air inside the tube)
-- [] - [battery symbol] - power supply voltage
-- * - [rotating fan symbol] - max of (front, rear) fans duty/RPM
-- F* - front fan duty/RPM
-- R* - rear fan duty/RPM
+- [battery symbol] - power supply voltage
+- [rotating fan symbol] - max of (front, rear) fans duty/RPM
+- F - front fan duty/RPM
+- R - rear fan duty/RPM
 
 Pressing [menu] or [ok] button will bring up the settings. Press buttons [<] or [>] to scroll throug optoins or increase/decrease values, [ok] to enter sub-level, [menu] to return back to upper level. The settings menu heirarchy is the following:
 
