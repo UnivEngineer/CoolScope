@@ -6,8 +6,13 @@
 #include <LiquidCrystal.h>
 //------------------------------------------------------------------------------------------
 // Special characters
-#define DEG   "\01"
-#define DELTA "\02"
+#define DEG   "\x01"
+#define DELTA "\x02"
+#define BATT  "\x03"
+#define FAN1  "\x04"
+#define FAN2  "\x05"
+#define FAN3  "\x06"
+#define BAR   "\xFF"
 //------------------------------------------------------------------------------------------
 // Interface messages
 //------------------------------------------------------------------------------------------
@@ -49,6 +54,17 @@ enum  CTextMessageId
   TXT_MIRR_AND_EXT,
   TXT_NOT_ASSIGNED,
   TXT_ERROR,
+  TXT_LOGO,
+  TXT_VER_OLED,
+  TXT_VER_LCD,
+  TXT_DISPLAY_TEST,
+  TXT_POWERED_BY_USB,
+  TXT_LOW_BATT_ALARM,
+  TXT_BATT_ALARM_VOLT,
+  TXT_LOW_BATTERY,
+  TXT_FANS_ENABLED,
+  TXT_FANS_DISABLED,
+  TXT_TEST_BARS
 };
 
 //------------------------------------------------------------------------------------------
@@ -88,16 +104,30 @@ const char mes31[] PROGMEM = "Mirror & ambient";
 const char mes32[] PROGMEM = "Mirror & extrnal";
 const char mes33[] PROGMEM = "< Not assigned >";
 const char mes34[] PROGMEM = "Error";
+const char mes35[] PROGMEM = "-= COOL SCOPE =-";
+const char mes36[] PROGMEM = "v1.1 OLED";
+const char mes37[] PROGMEM = "v1.1 LCD";
+const char mes38[] PROGMEM = "Test";
+const char mes39[] PROGMEM = "Powered by USB";
+const char mes40[] PROGMEM = "Low batt. alarm";
+const char mes41[] PROGMEM = "Batt. alarm volt";
+const char mes42[] PROGMEM = "Battery is low!";
+const char mes43[] PROGMEM = "Fans enabled";
+const char mes44[] PROGMEM = "Fans disabled";
+const char mes45[] PROGMEM = BAR BAR BAR BAR BAR BAR BAR BAR BAR BAR BAR BAR BAR BAR BAR BAR;
+
 //------------------------------------------------------------------------------------------
 const char * const mes_table[] PROGMEM =
 {
   mes00, mes01, mes02, mes03, mes04, mes05, mes06, mes07, mes08, mes09,
   mes10, mes11, mes12, mes13, mes14, mes15, mes16, mes17, mes18, mes19,
   mes20, mes21, mes22, mes23, mes24, mes25, mes26, mes27, mes28, mes29,
-  mes30, mes31, mes32, mes33, mes34
+  mes30, mes31, mes32, mes33, mes34, mes35, mes36, mes37, mes38, mes39,
+  mes40, mes41, mes42, mes43, mes44, mes45
 };
 //------------------------------------------------------------------------------------------
-const char * LoadMessage(CTextMessageId n);
+const char * LoadMessage (CTextMessageId n);
+const char * LoadMessage2(CTextMessageId n);
 //------------------------------------------------------------------------------------------
 
 class CDisplay
@@ -110,8 +140,7 @@ class CDisplay
   static const uint32_t MaxBrightDutyLCD  = 255; // Max workable LCD backlingt value (PWM duty)
   static const uint32_t MaxBrightDutyOLED =  80; // Max workable OLED dimming  value (PWM duty), OLED brightness is inverted
 
-  static const int NCustomChars = 21;
-  static uint8_t CustomChars[NCustomChars][8];
+  static uint8_t CustomChars[][8];
 
   void  SetTextMode();
   void  SetGraphMode();

@@ -35,7 +35,7 @@ void  CFansController::Init()
 
 void  CFansController::Update()
 {
-  if ((varCoolingMode.value == C_OFF) || settings.isPowerLost())
+  if ((varCoolingEnabled.value == 0) || settings.isPowerLost())
   {
     state.fanDuty1 = state.fanDuty2 = 0;
   }
@@ -60,7 +60,7 @@ void  CFansController::Update()
       {
         case C_COOL_AND_BLOW: state.fanDuty2 = 0; break;
         case C_COOL_AND_SUCK: state.fanDuty1 = 0; break;
-        case C_COOL_AND_OFF:  state.fanDuty1 = state.fanDuty2 = 0; break;
+        case C_COOL_AND_STOP: state.fanDuty1 = state.fanDuty2 = 0; break;
       }
     }
   }
@@ -96,6 +96,15 @@ void  CFansController::Update()
     fanStuck1 = (state.fanDuty1 != 0) && (state.fanRPM1 == 0);
     fanStuck2 = (state.fanDuty2 != 0) && (state.fanRPM2 == 0);
     lastTimeStuck = t;
+  }
+
+  if (isStuck())
+  {
+    menu.ShowMessage(
+      fanStuck1 ? LoadMessage (TXT_FAN_1_STUCK) : nullptr, // LoadMessage(TXT_FAN_2_STUCK),
+      fanStuck2 ? LoadMessage2(TXT_FAN_2_STUCK) : nullptr,
+      MSG_SHORT_TIME,
+      true);
   }
 }
 

@@ -3,42 +3,66 @@
 //------------------------------------------------------------------------------------------
 CDisplay display;
 //------------------------------------------------------------------------------------------
-char mesBuffer[17];
+
+uint8_t CDisplay::CustomChars[][8] =
+{
+  {B01100,B10010,B10010,B01100,B00000,B00000,B00000,B00000}, // symbol "°"
+  {B00000,B00100,B00100,B01010,B01010,B10001,B11111,B00000}, // symbol "⌂"
+  {B01110,B11011,B10001,B10001,B10001,B10001,B10001,B11111}, // symbol "Battery"
+  //{B00000,B01100,B00100,B01110,B11010,B10011,B00000,B00000}, // symbol "Fan 1"
+  //{B00000,B11001,B01011,B01110,B00100,B00110,B00000,B00000}, // symbol "Fan 2"
+  //{B00000,B00001,B00111,B11100,B10110,B00011,B00000,B00000}, // symbol "Fan 3"
+  {B00000,B01100,B00101,B11111,B10100,B00110,B00000,B00000}, // symbol "Fan 1"
+  {B00000,B00010,B11010,B00100,B01011,B01000,B00000,B00000}, // symbol "Fan 2"
+  {B00000,B11001,B01011,B00100,B11010,B10011,B00000,B00000}, // symbol "Fan 3"
+#ifdef RUSSIAN
+  {B11110,B10000,B10000,B11110,B10001,B10001,B11110,B00000}, // symbol "Б"
+  {B11111,B10001,B10000,B10000,B10000,B10000,B10000,B00000}, // symbol "Г"
+  {B01111,B00101,B00101,B01001,B10001,B11111,B10001,B00000}, // symbol "Д"
+  {B10101,B10101,B10101,B11111,B10101,B10101,B10101,B00000}, // symbol "Ж"
+  {B01110,B10001,B00001,B00010,B00001,B10001,B01110,B00000}, // symbol "З"
+  {B10001,B10011,B10011,B10101,B11001,B11001,B10001,B00000}, // symbol "И"
+  {B01110,B00000,B10001,B10011,B10101,B11001,B10001,B00000}, // symbol "Й"
+  {B00011,B00111,B00101,B00101,B01101,B01001,B11001,B00000}, // symbol "Л"
+  {B11111,B10001,B10001,B10001,B10001,B10001,B10001,B00000}, // symbol "П"
+  {B10001,B10001,B10001,B01010,B00100,B01000,B10000,B00000}, // symbol "У"
+  {B00100,B11111,B10101,B10101,B11111,B00100,B00100,B00000}, // symbol "Ф"
+  {B10010,B10010,B10010,B10010,B10010,B10010,B11111,B00001}, // symbol "Ц"
+  {B10001,B10001,B10001,B01111,B00001,B00001,B00001,B00000}, // symbol "Ч"
+  {B10101,B10101,B10101,B10101,B10101,B10101,B11111,B00000}, // symbol "Ш"
+  {B10101,B10101,B10101,B10101,B10101,B10101,B11111,B00001}, // symbol "Щ"
+  {B10000,B10000,B10000,B11110,B10001,B10001,B11110,B00000}, // symbol "Ь"
+  {B10001,B10001,B10001,B11001,B10101,B10101,B11001,B00000}, // symbol "Ы"
+  {B10010,B10101,B10101,B11101,B10101,B10101,B10010,B00000}, // symbol "Ю"
+  {B01111,B10001,B10001,B01111,B00101,B01001,B10001,B00000}, // symbol "Я"
+#endif
+};
+
+//------------------------------------------------------------------------------------------
+char mesBuffer [LINE_LENGTH+1];
+char mesBuffer2[LINE_LENGTH+1];
 //------------------------------------------------------------------------------------------
 
 const char * LoadMessage(CTextMessageId n)
 {
   strcpy_P(mesBuffer, (char*)pgm_read_word(&(mes_table[n])));
-  mesBuffer[16] = 0; // protection
+  mesBuffer[LINE_LENGTH] = 0; // protection
   return mesBuffer;
 }
 
 //------------------------------------------------------------------------------------------
 
-uint8_t CDisplay::CustomChars[CDisplay::NCustomChars][8] =
+const char * LoadMessage2(CTextMessageId n)
 {
-  {B11110,B10000,B10000,B11110,B10001,B10001,B11110,B00000}, // index  0, symbol "Б"
-  {B11111,B10001,B10000,B10000,B10000,B10000,B10000,B00000}, // index  1, symbol "Г"
-  {B01111,B00101,B00101,B01001,B10001,B11111,B10001,B00000}, // index  2, symbol "Д"
-  {B10101,B10101,B10101,B11111,B10101,B10101,B10101,B00000}, // index  3, symbol "Ж"
-  {B01110,B10001,B00001,B00010,B00001,B10001,B01110,B00000}, // index  4, symbol "З"
-  {B10001,B10011,B10011,B10101,B11001,B11001,B10001,B00000}, // index  5, symbol "И"
-  {B01110,B00000,B10001,B10011,B10101,B11001,B10001,B00000}, // index  6, symbol "Й"
-  {B00011,B00111,B00101,B00101,B01101,B01001,B11001,B00000}, // index  7, symbol "Л"
-  {B11111,B10001,B10001,B10001,B10001,B10001,B10001,B00000}, // index  8, symbol "П"
-  {B10001,B10001,B10001,B01010,B00100,B01000,B10000,B00000}, // index  9, symbol "У"
-  {B00100,B11111,B10101,B10101,B11111,B00100,B00100,B00000}, // index 10, symbol "Ф"
-  {B10010,B10010,B10010,B10010,B10010,B10010,B11111,B00001}, // index 11, symbol "Ц"
-  {B10001,B10001,B10001,B01111,B00001,B00001,B00001,B00000}, // index 12, symbol "Ч"
-  {B10101,B10101,B10101,B10101,B10101,B10101,B11111,B00000}, // index 13, symbol "Ш"
-  {B10101,B10101,B10101,B10101,B10101,B10101,B11111,B00001}, // index 14, symbol "Щ"
-  {B10000,B10000,B10000,B11110,B10001,B10001,B11110,B00000}, // index 15, symbol "Ь"
-  {B10001,B10001,B10001,B11001,B10101,B10101,B11001,B00000}, // index 16, symbol "Ы"
-  {B10010,B10101,B10101,B11101,B10101,B10101,B10010,B00000}, // index 17, symbol "Ю"
-  {B01111,B10001,B10001,B01111,B00101,B01001,B10001,B00000}, // index 18, symbol "Я"
-  {B01100,B10010,B10010,B01100,B00000,B00000,B00000,B00000}, // index 19, symbol "°"
-  {B00000,B00100,B00100,B01010,B01010,B10001,B11111,B00000}, // index 20, symbol "⌂"
-};
+  strcpy_P(mesBuffer2, (char*)pgm_read_word(&(mes_table[n])));
+  mesBuffer2[LINE_LENGTH] = 0; // protection
+  return mesBuffer2;
+}
+
+//------------------------------------------------------------------------------------------
+
+
+
 
 //------------------------------------------------------------------------------------------
 
@@ -86,7 +110,7 @@ void  CDisplay::Init()
     // Fix bugs with Winstar OLED initializtion
     SetTextMode();
 
-    // Remove "Contrast" menu item, because OLED display doesn't need it
+    // Remove the "Contrast" menu item, because OLED display doesn't need it
     menu.HideNode(MENU_DISP_CONTRAST);
   }
   else
@@ -96,25 +120,17 @@ void  CDisplay::Init()
   }
 
   // Load custom characters: maximum 8!
-  lcd.createChar((byte)DEG  [0], CustomChars[19]); // DEG   code == 1
-  lcd.createChar((byte)DELTA[0], CustomChars[20]); // DELTA code == 2
-
-#ifdef RUSSIAN
-  lcd.createChar(3, CustomChars[4]);
-  lcd.createChar(4, CustomChars[1]);
-  lcd.createChar(5, CustomChars[9]);
+  lcd.createChar((byte)DEG  [0], CustomChars[0]); // DEG,   code == 1
+  lcd.createChar((byte)DELTA[0], CustomChars[1]); // DELTA, code == 2
+  lcd.createChar((byte)BATT [0], CustomChars[2]); // BATT,  code == 3
+  lcd.createChar((byte)FAN1 [0], CustomChars[3]); // FAN1,  code == 4
+  lcd.createChar((byte)FAN2 [0], CustomChars[4]); // FAN2,  code == 5
+  lcd.createChar((byte)FAN3 [0], CustomChars[5]); // FAN3,  code == 6
 
   lcd.setCursor(0, 0);
-  lcd.print(F(\0x03 "A" \0x04 "P" \0x05 \0x03 "KA..."));
-#else
-  lcd.setCursor(0, 0);
-  lcd.print  (F("-= COOL SCOPE =-"));
-  lcd.setCursor(0, 1);
-  if (isOLED)
-    lcd.print(F("   v1.0 OLED"));
-  else
-    lcd.print(F("   v1.0 LCD"));
-#endif
+  lcd.print(LoadMessage(TXT_LOGO));
+  lcd.setCursor(4, 1);
+  lcd.print(LoadMessage(isOLED ? TXT_VER_OLED : TXT_VER_LCD));
 
   // Set display contrast/brightness (variables must be already initialized from EEPROM)
   SetBrightAndContrast();
@@ -153,7 +169,7 @@ void  CDisplay::Off(bool hard)
 void  CDisplay::SetBrightAndContrast()
 {
   // Update dimming brightness value (PWM duty)
-  // Use gamma correction (power of 2) to make brightness change more linear to eye
+  // Use gamma correction (power of 2) to make brightness change more natural for perception
   const uint32_t brMaxSquared = varDisplayBright.valueMax * varDisplayBright.valueMax;
   uint32_t brSquared = varDisplayBright.value * varDisplayBright.value;
 

@@ -8,8 +8,12 @@
 #define POWER_DETECT_PERIOD     5     // ms
 #define MAIN_LOOP_PERIOD        100   // ms
 #define TEMP_SENSOR_READ_PERIOD 1000  // ms
+#define POWER_RESTORE_DELAY     500   // ms
 #define FAN_RPM_COUNT_TIME      500   // ms
 #define FAN_STUCK_WAIT_TIME     2000  // ms
+#define MSG_SHORT_TIME          100   // ms
+#define MSG_LONG_TIME           2000  // ms
+#define MSG_BLINK_HALFPERIOD    500   // ms
 #define EEPROM_WRITE_WAIT_TIME  10000 // ms
 //------------------------------------------------------------------------------------------
 
@@ -65,6 +69,8 @@
 //------------------------------------------------------------------------------------------
 #include "temp.h"
 #include "vars.h"
+#include "settings.h"
+#include "state.h"
 #include "fans.h"
 #include "display.h"
 #include "keys.h"
@@ -116,24 +122,23 @@ void loop()
   if (!settings.isPowerLost())
   {
     // Read keyboard
-    bool keyBack  = BackButton .isClick();
-    bool keyPrev  = PrevButton .isClick();
-    bool keyNext  = NextButton .isClick();
-    bool keyEnter = EnterButton.isClick();
+    keys.update();
+
+    bool anyKey = keys.isClickedAny();
   
-    bool anyKey = keyBack || keyPrev || keyNext || keyEnter;
-  
-    if (display.isOff && (anyKey || fans.isStuck() || settings.isPowerRestored()))
+    if (display.isOff && (anyKey || fans.isStuck() || settings.isLowBattery() || settings.isPowerRestored()))
       display.On();
     else
     {
       if (anyKey)
         display.Touch();
   
-      if (keyBack)  menu.onBack();
-      if (keyPrev)  menu.onPrev();
-      if (keyNext)  menu.onNext();
-      if (keyEnter) menu.onEnter();
+      if (keys.Button[BT_MENU] .isHeld())  menu.onHold();
+
+      if (keys.Button[BT_MENU] .isClick()) menu.onBack();
+      if (keys.Button[BT_PREV] .isClick()) menu.onPrev();
+      if (keys.Button[BT_NEXT] .isClick()) menu.onNext();
+      if (keys.Button[BT_ENTER].isClick()) menu.onEnter();
     }
   
     // Read temperature sensors
