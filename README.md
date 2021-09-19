@@ -52,7 +52,7 @@ Settings
   - Brightness [values are 0, 1, ... 10]
   - Contrast [LCD only; values are 1, ... 10]
   - Timeout [values are "Disabled", 5, 10, 15, ..., 120 seconds]
-  - Test [all pixels of display are filled until "menu" is pressed]
+  - Test [all pixels of display are filled until [menu] is pressed]
 - Information
   - Uptime
   - Fan stuck alarm [values are "off", "on"]
