@@ -17,7 +17,7 @@ The device has the wrong power polarity protection circut, and power voltage mon
 
 ----------------------------------------------------------------------------------
 
-Short usage manual (v 1.1)
+Short usage manual (v 1.2)
 
 Device has 4 buttons: [menu], [<], [>], [ok].
 
@@ -57,12 +57,14 @@ Settings
   - Uptime
   - Fan stuck alarm [values are "off", "on"]
   - Low battery alarm [values are "off", "on"]
-  - Bttery alarm voltage [values are 8.0, 8.1, ... 12.0 volts]
+  - Battery alarm voltage [values are 8.0, 8.1, ... 12.0 volts]
   - Power voltage [current power supply voltage]
   - About
 
 Pressing and holding the menu button, while on the info screen, will disable/enable cooling (the message "Fans enabled"/"Fans disabled" is displayed for a few seconds). This is a quicker way to stop fans than accessing "Cooling->Fans enabled" menu.
 
-Depending on "Dispaly->Timeout" settings, the dispaly may turn off after a while (if LCD is used, only backlight will turn off). To turn on it back, simply press any button.
+Depending on "Display->Timeout" settings, the dispaly may turn off after a while (if LCD is used, only backlight will turn off). To turn on it back, simply press any button.
 
 The device will run fans at "Cooling->Cooling speed" duty until specified delta T is reached. After that, it will either stop fans or keep them spinning at "Cooling->Keeping speed". Typically, you need the primary mirror of your scope to be in thermal equilibrium with outside air, so the "Target delta T pair" must be set to "Mirror and External", and external DS18B20 sensor plugged into the 3.5 mm jack. The "Ambient" sensor is mounted inside the device, thus may report higher temperatures because of observer breathing. For a balcony observations, the "Mirror and Tube" pair may give better results, because air at balcony is warmer than the outside air anyway.
+
+V 1.2 - added auto switch to external sensor, then plugged in; added CRC check of data read from sensors.
