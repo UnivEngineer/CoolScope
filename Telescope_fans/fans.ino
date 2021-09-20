@@ -91,7 +91,8 @@ void  CFansController::Update()
   if (state.fanRPM2 != 0) fanStuck2 = false;
 
   timePassed = t - lastTimeStuck;
-  if (timePassed >= FAN_STUCK_WAIT_TIME)
+  uint32_t timePassed2 = t - lastTimeFansEnabled;
+  if ((timePassed >= FAN_STUCK_WAIT_TIME) && (timePassed2 >= FAN_STUCK_IGNORE_TIME))
   {
     fanStuck1 = (state.fanDuty1 != 0) && (state.fanRPM1 == 0);
     fanStuck2 = (state.fanDuty2 != 0) && (state.fanRPM2 == 0);
@@ -119,7 +120,14 @@ void  CFansController::Off()
 
 //------------------------------------------------------------------------------------------
 
-bool CFansController::isStuck()
+void  CFansController::PauseStuckDetection()
+{
+  lastTimeFansEnabled = millis();
+}
+
+//------------------------------------------------------------------------------------------
+
+bool  CFansController::isStuck()
 {
   return (varFanStuckAlarm.value == 1) && !settings.isPoweredByUSB() && (fanStuck1 || fanStuck2);
 }
@@ -127,7 +135,7 @@ bool CFansController::isStuck()
 //------------------------------------------------------------------------------------------
 // Configure Timer 1 (pins 9, 10) to output 25kHz PWM
 
-void CFansController::setupTimer1()
+void  CFansController::setupTimer1()
 {
     //Set PWM frequency to about 25khz on pins 9, 10 (timer 1 mode 10, no prescale, count to 320)
     TCCR1A = (1 << COM1A1) | (1 << COM1B1) | (1 << WGM11);
@@ -140,7 +148,7 @@ void CFansController::setupTimer1()
 //------------------------------------------------------------------------------------------
 // Configure Timer 2 (pin 3) to output 25kHz PWM. Pin 11 will be unavailable for output in this mode
 
-void CFansController::setupTimer2()
+void  CFansController::setupTimer2()
 {
     //Set PWM frequency to about 25khz on pin 3 (timer 2 mode 5, prescale 8, count to 79)
     TIMSK2 = 0;
@@ -153,21 +161,21 @@ void CFansController::setupTimer2()
 
 //------------------------------------------------------------------------------------------
 
-void CFansController::setPWM1A(int duty)
+void  CFansController::setPWM1A(int duty)
 {
     OCR1A = (uint16_t)((duty * 640l) / 100l);
 }
 
 //------------------------------------------------------------------------------------------
 
-void CFansController::setPWM1B(int duty)
+void  CFansController::setPWM1B(int duty)
 {
     OCR1B = (uint16_t)((duty * 640l) / 100l);
 }
 
 //------------------------------------------------------------------------------------------
 
-void CFansController::setPWM2(int duty)
+void  CFansController::setPWM2(int duty)
 {
     OCR2B = (uint8_t)((duty * 79l) / 100l);
 }
@@ -178,7 +186,7 @@ uint32_t volatile CFansController::fanCounter2 = 0;
 //------------------------------------------------------------------------------------------
 // Interrupt handler, stores the timestamps of the last 2 interrupts and handles debouncing
 
-void CFansController::tach1ISR()
+void  CFansController::tach1ISR()
 {
   fanCounter1++;
 }
@@ -186,7 +194,7 @@ void CFansController::tach1ISR()
 //------------------------------------------------------------------------------------------
 // Interrupt handler, stores the timestamps of the last 2 interrupts and handles debouncing
 
-void CFansController::tach2ISR()
+void  CFansController::tach2ISR()
 {
   fanCounter2++;
 }

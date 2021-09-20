@@ -4,6 +4,42 @@
 CState    state;
 //------------------------------------------------------------------------------------------
 
+CState::CState()
+{
+  for (int i=0; i<S_COUNT; ++i)
+    temp[i] = NO_TEMP;
+}
+
+//------------------------------------------------------------------------------------------
+
+bool  CState::isExtSensorAvailable()
+{
+  return state.temp[S_EXTERNAL] != NO_TEMP;
+}
+
+//------------------------------------------------------------------------------------------
+
+bool  CState::isUseExtSensor()
+{
+  return isExtSensorAvailable() && (varDtSecondSensor.value != S_AMBIENT);
+}
+
+//------------------------------------------------------------------------------------------
+
+void  CState::CalcTempDelta()
+{
+  int sensor = varDtSecondSensor.value;
+  if ((sensor == S_EXTERNAL) && !isExtSensorAvailable())
+    sensor = S_AMBIENT;
+
+  if (temp[S_MIRROR] == NO_TEMP || temp[sensor] == NO_TEMP)
+    tempDelta = NO_TEMP;
+  else
+    tempDelta = temp[S_MIRROR] - temp[sensor];
+}
+
+//------------------------------------------------------------------------------------------
+
 const char * CState::GetFanSymbol(int duty)
 {
   if (duty == 0)
@@ -18,6 +54,22 @@ const char * CState::GetFanSymbol(int duty)
       case 1:  return FAN2;
       default: return FAN3;
     }
+  }
+}
+
+//------------------------------------------------------------------------------------------
+
+void  CState::PrintDeltaTHelper(int pos)
+{
+  char * buf = &text[pos];
+  if (tempDelta == NO_TEMP)
+    strcpy(buf, DELTA "T ---- ");
+  else
+  {
+    if (fabs(tempDelta) < 10.0f)
+      sprintf(buf, DELTA "T% 4.2f" DEG, tempDelta);
+    else
+      sprintf(buf, DELTA "T% 5.1f" DEG, tempDelta);
   }
 }
 
@@ -66,7 +118,7 @@ void  CState::PrintVoltHelper(const char * symbol, int pos)
 
 char * CState::GetTempStr0()
 {
-  if (varDtSecondSensor.value == S_EXTERNAL)
+  if (isUseExtSensor())
     PrintTempHelper(" E", 0, temp[S_EXTERNAL]);
   else
     PrintTempHelper(" A", 0, temp[S_AMBIENT]);
@@ -79,8 +131,8 @@ char * CState::GetTempStr0()
 
 char * CState::GetTempStr1()
 {
-  PrintTempHelper(DELTA "T", 0, tempDelta);
-  PrintTempHelper(" T",      8, temp[S_TUBE]);
+  PrintDeltaTHelper(0);
+  PrintTempHelper(" T", 8, temp[S_TUBE]);
   return text;
 }
 
@@ -88,7 +140,7 @@ char * CState::GetTempStr1()
 
 char * CState::GetComboStr0()
 {
-  if (varDtSecondSensor.value == S_EXTERNAL)
+  if (isUseExtSensor())
     PrintTempHelper(" E", 0, temp[S_EXTERNAL]);
   else
     PrintTempHelper(" A", 0, temp[S_AMBIENT]);
@@ -102,7 +154,7 @@ char * CState::GetComboStr0()
 
 char * CState::GetComboStr1Style1()
 {
-  PrintTempHelper(DELTA "T", 0, tempDelta);
+  PrintDeltaTHelper(0);
   PrintFanDutyHelper(" ", 8, max(fanDuty1, fanDuty2), true);
   return text;
 }
@@ -111,7 +163,7 @@ char * CState::GetComboStr1Style1()
 
 char * CState::GetComboStr1Style2()
 {
-  PrintTempHelper(DELTA "T", 0, tempDelta);
+  PrintDeltaTHelper(0);
   PrintFanRPMHelper(" ", 8, max(fanDuty1, fanDuty2), max(fanRPM1, fanRPM2), true);
   return text;
 }
@@ -120,7 +172,7 @@ char * CState::GetComboStr1Style2()
 
 char * CState::GetTempFansStr0Style1()
 {
-  if (varDtSecondSensor.value == S_EXTERNAL)
+  if (isUseExtSensor())
     PrintTempHelper(" E", 0, temp[S_EXTERNAL]);
   else
     PrintTempHelper(" A", 0, temp[S_AMBIENT]);
@@ -133,8 +185,8 @@ char * CState::GetTempFansStr0Style1()
 
 char * CState::GetTempFansStr1Style1()
 {
-  PrintTempHelper(DELTA "T", 0, tempDelta);
-  PrintFanDutyHelper (" R", 8, fanDuty2, true);
+  PrintDeltaTHelper(0);
+  PrintFanDutyHelper(" R", 8, fanDuty2, true);
   return text;
 }
 
@@ -142,7 +194,7 @@ char * CState::GetTempFansStr1Style1()
 
 char * CState::GetTempFansStr0Style2()
 {
-  if (varDtSecondSensor.value == S_EXTERNAL)
+  if (isUseExtSensor())
     PrintTempHelper(" E", 0, temp[S_EXTERNAL]);
   else
     PrintTempHelper(" A", 0, temp[S_AMBIENT]);
@@ -155,8 +207,8 @@ char * CState::GetTempFansStr0Style2()
 
 char * CState::GetTempFansStr1Style2()
 {
-  PrintTempHelper(DELTA "T", 0, tempDelta);
-  PrintFanRPMHelper  (" R", 8, fanDuty2, fanRPM2, true);
+  PrintDeltaTHelper(0);
+  PrintFanRPMHelper(" R", 8, fanDuty2, fanRPM2, true);
   return text;
 }
 

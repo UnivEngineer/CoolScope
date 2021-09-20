@@ -78,6 +78,9 @@ void  CMenu::onHold()
   if (!inMenu)
     varCoolingEnabled.inc();
 
+  if (varCoolingEnabled.value == 1)
+    fans.PauseStuckDetection();
+
   ShowMessage(
     LoadMessage((varCoolingEnabled.value == 1) ? TXT_FANS_ENABLED : TXT_FANS_DISABLED),
     nullptr,

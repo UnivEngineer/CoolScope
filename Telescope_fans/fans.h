@@ -15,6 +15,7 @@ public:
   void  Update();
   void  Off();
   bool  isStuck();
+  void  PauseStuckDetection();
 
   bool  fanStuck1 = false;
   bool  fanStuck2 = false;
@@ -33,6 +34,7 @@ private:
   static uint32_t volatile fanCounter2;
   uint32_t lastTimeRPM = 0;
   uint32_t lastTimeStuck = 0;
+  uint32_t lastTimeFansEnabled = 0;
 };
 
 //------------------------------------------------------------------------------------------

@@ -48,7 +48,7 @@ void  CTempSensors::Update()
     state.temp[S_AMBIENT]  = ReadTempSensor(varSensor2Index.address);
     state.temp[S_EXTERNAL] = ReadTempSensor(varSensor3Index.address);
 
-    state.tempDelta = state.temp[S_MIRROR] - state.temp[varDtSecondSensor.value];
+    state.CalcTempDelta();
 
     lastTempReadTime = t;
   }
@@ -207,7 +207,7 @@ float CTempSensors::ReadTempSensor(byte * addr)
       Serial.print(text);
       Serial.println(F(": invalid address or CRC"));
     #endif*/
-    return -1000.0f;
+    return NO_TEMP;
   }
   
   // Read temperature from PREVIOUS conversion command
@@ -219,6 +219,22 @@ float CTempSensors::ReadTempSensor(byte * addr)
   byte data[12];
   for (int i=0; i<9; i++) // we need 9 bytes
     data[i] = ds.read();
+
+  byte dataCRC = OneWire::crc8(data, 8);
+  if (dataCRC != data[8])
+  {
+    #ifdef DEBUG
+      AddressToHexStr(addr, text);
+      Serial.print(F("Device "));
+      Serial.print(text);
+      Serial.print(F(": invalid data CRC (computed = "));
+      Serial.print(dataCRC);
+      Serial.print(F(", read = "));
+      Serial.print(data[8]);
+      Serial.println(")");
+    #endif
+    return NO_TEMP;
+  }
 
   // Get the sensor resolution: 9 bits (0), 10 bits (1), 11 bits (2), 12 bits (3)
   // If the resolution is not 12 bits, lower bits of LB (data[0]) are undefined,

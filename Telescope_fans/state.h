@@ -22,7 +22,9 @@ public:
   uint8_t  fanDuty1 = 0; // in %
   uint8_t  fanDuty2 = 0; // in %
 
-  CState() {};
+  CState();
+
+  void  CalcTempDelta();
 
   char * GetTempStr0();
   char * GetTempStr1();
@@ -38,7 +40,11 @@ public:
 
 private:
 
-  const char * GetFanSymbol(int duty);
+  bool  isExtSensorAvailable();
+  bool  isUseExtSensor();
+
+  const char* GetFanSymbol(int duty);
+  void  PrintDeltaTHelper (int pos);
   void  PrintTempHelper   (const char * symbol, int pos, float T);
   void  PrintFanRPMHelper (const char * symbol, int pos, int duty, uint32_t RPM,  bool fanSymbol);
   void  PrintFanDutyHelper(const char * symbol, int pos, int duty,                bool fanSymbol);

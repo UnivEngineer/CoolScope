@@ -5,18 +5,20 @@
 //#define RUSSIAN
 //------------------------------------------------------------------------------------------
 #define LINE_LENGTH             16
-#define POWER_DETECT_PERIOD     5     // ms
-#define MAIN_LOOP_PERIOD        100   // ms
-#define TEMP_SENSOR_READ_PERIOD 1000  // ms
-#define POWER_RESTORE_DELAY     500   // ms
-#define FAN_RPM_COUNT_TIME      500   // ms
-#define FAN_STUCK_WAIT_TIME     2000  // ms
-#define MSG_SHORT_TIME          100   // ms
-#define MSG_LONG_TIME           2000  // ms
-#define MSG_BLINK_HALFPERIOD    500   // ms
-#define EEPROM_WRITE_WAIT_TIME  10000 // ms
 //------------------------------------------------------------------------------------------
-
+// All times in milliseconds
+#define POWER_DETECT_PERIOD     5     // period to measure power voltage and detect power loss
+#define MAIN_LOOP_PERIOD        100   // main program loop peroid
+#define TEMP_SENSOR_READ_PERIOD 1000  // period to read temperature from sensors
+#define POWER_RESTORE_DELAY     500   // wait time before power restored signal
+#define FAN_RPM_COUNT_TIME      1000  // period of fan RPM measurement (pulse accumulation)
+#define FAN_STUCK_WAIT_TIME     2000  // report fan failure if it don't spin this long
+#define FAN_STUCK_IGNORE_TIME   5000  // don't detect fan failure after cooling on/off
+#define MSG_SHORT_TIME          100   // short message (blinking alerts) display time
+#define MSG_LONG_TIME           2000  // long message ("fans enabled/disbled") display time
+#define MSG_BLINK_HALFPERIOD    500   // half of message blinking period
+#define EEPROM_WRITE_WAIT_TIME  10000 // delay between writes to EEPROM memory
+//------------------------------------------------------------------------------------------
 
 
 
