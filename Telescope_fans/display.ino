@@ -4,6 +4,10 @@
 CDisplay display;
 //------------------------------------------------------------------------------------------
 
+
+//------------------------------------------------------------------------------------------
+#ifndef GRAPHICS_MODE
+
 uint8_t CDisplay::CustomChars[][8] =
 {
   {B01100,B10010,B10010,B01100,B00000,B00000,B00000,B00000}, // symbol "°"
@@ -38,6 +42,13 @@ uint8_t CDisplay::CustomChars[][8] =
 #endif
 };
 
+#endif // GRAPHICS_MODE
+
+//------------------------------------------------------------------------------------------
+
+
+
+
 //------------------------------------------------------------------------------------------
 char mesBuffer [LINE_LENGTH+1];
 char mesBuffer2[LINE_LENGTH+1];
@@ -68,20 +79,24 @@ const char * LoadMessage2(CTextMessageId n)
 
 void  CDisplay::SetTextMode()
 {
+#ifndef OLED_I2C
   lcd.command(0x08);        // off screen
   lcd.command(0x17);        // switch to text mode
   lcd.command(0x01);        // clean RAM
   lcd.command(0x04 | 0x08); // on screen
+#endif
 }
 
 //------------------------------------------------------------------------------------------
 
 void  CDisplay::SetGraphMode()
 {
+#ifndef OLED_I2C
   lcd.command(0x08);      // off screen
   lcd.command(0x1F);      // switch to graphics mode
   lcd.command(0x01);      // clean RAM
   lcd.command(0x08|0x04); // on screen
+#endif
 }
 
 //------------------------------------------------------------------------------------------
@@ -93,22 +108,33 @@ void  CDisplay::Init()
   int v = analogRead(LCD_DETECT_PIN);
   isOLED = (v > 512);
 
-  #ifdef DEBUG
-    Serial.print(F("Detecting disply type: jumper read = "));
-    Serial.print(v);
-    if (isOLED)
-      Serial.println(F(" (OLED)"));
-    else
-      Serial.println(F(": (LCD)"));
-  #endif
+#ifdef DEBUG
+  Serial.print(F("Detecting display type: jumper read = "));
+  Serial.print(v);
+  if (isOLED)
+    Serial.println(F(" (OLED)"));
+  else
+    Serial.println(F(" (LCD)"));
 
+  Serial.print(F("Initializing display\n"));
+#endif
+
+#ifdef OLED_I2C
+  lcd.init();
+  lcd.begin(16, 2);
+#else
   // Set up the LCD's number of columns and rows:
   lcd.begin(16, 2);
+#endif
 
   if (isOLED)
   {
     // Fix bugs with Winstar OLED initializtion
+#ifdef GRAPHICS_MODE
+    SetGraphMode();
+#else
     SetTextMode();
+#endif
 
     // Remove the "Contrast" menu item, because OLED display doesn't need it
     menu.HideNode(MENU_DISP_CONTRAST);
@@ -119,6 +145,11 @@ void  CDisplay::Init()
     varDisplayBright.valueMin = 0;
   }
 
+#ifdef DEBUG
+  Serial.print(F("Loading custom chars\n"));
+#endif
+
+#ifndef GRAPHICS_MODE
   // Load custom characters: maximum 8!
   lcd.createChar((byte)DEG  [0], CustomChars[0]); // DEG,   code == 1
   lcd.createChar((byte)DELTA[0], CustomChars[1]); // DELTA, code == 2
@@ -126,11 +157,14 @@ void  CDisplay::Init()
   lcd.createChar((byte)FAN1 [0], CustomChars[3]); // FAN1,  code == 4
   lcd.createChar((byte)FAN2 [0], CustomChars[4]); // FAN2,  code == 5
   lcd.createChar((byte)FAN3 [0], CustomChars[5]); // FAN3,  code == 6
+#endif
 
-  lcd.setCursor(0, 0);
-  lcd.print(LoadMessage(TXT_LOGO));
-  lcd.setCursor(4, 1);
-  lcd.print(LoadMessage(isOLED ? TXT_VER_OLED : TXT_VER_LCD));
+  PrintText(0, 0, LoadMessage(TXT_LOGO));
+  PrintText(4, 1, LoadMessage(isOLED ? TXT_VER_OLED : TXT_VER_LCD));
+
+#ifdef DEBUG
+  Serial.print(F("Done\n"));
+#endif
 
   // Set display contrast/brightness (variables must be already initialized from EEPROM)
   SetBrightAndContrast();
@@ -150,6 +184,9 @@ void  CDisplay::On()
 {
   lcd.display();
   Touch();
+#ifdef GRAPHICS_MODE
+  lastSaverTime = millis();
+#endif
 }
 
 //------------------------------------------------------------------------------------------
@@ -162,6 +199,16 @@ void  CDisplay::Off(bool hard)
   analogWrite(PWM_BRIGHT_LCD, 0); // turn off backlight
 
   isOff = true;
+}
+
+//------------------------------------------------------------------------------------------
+
+void  CDisplay::Clear()
+{
+  lcd.command(0x01); // clean RAM
+
+  for (int i=0; i<2; ++i)
+      memset(memLine[i], 0, 17);
 }
 
 //------------------------------------------------------------------------------------------
@@ -198,22 +245,43 @@ void  CDisplay::Update()
 {
   if (isOLED && isOff && (varDisplayTimeout.value > 0)) return;
 
+  uint32_t t = millis();
+
+#ifdef GRAPHICS_MODE
+  // Screensaver for graphics Winstar OLDE
+  if (!isOff && (t > lastSaverTime + OLED_SCREEN_SAVER))
+  {
+      lastSaverTime = t;
+      saverShiftX = random(4);
+      saverShiftY = random(2);
+      Clear();
+
+#ifdef DEBUG
+      sprintf(text, "Saver x = %i, y = %i", saverShiftX, saverShiftY);
+      Serial.println(text);
+#endif
+  }
+#endif
+
   SetBrightAndContrast();
 
-  // Print line 0
-  strcpy(text, menu.GetLine0());
-  AppendWithSpaces(text, LINE_LENGTH);
-  lcd.setCursor(0, 0);
-  lcd.print(text);
-
-  // Print line 1
-  strcpy(text, menu.GetLine1());
-  AppendWithSpaces(text, LINE_LENGTH);
-  lcd.setCursor(0, 1);
-  lcd.print(text);
+  if (menu.isDisplayTest())
+    Test();
+  else
+  {
+    // Print line 0
+    strcpy(text, menu.GetLine0());
+    AppendWithSpaces(text, LINE_LENGTH);
+    PrintLineSmart(0, text);
+  
+    // Print line 1
+    strcpy(text, menu.GetLine1());
+    AppendWithSpaces(text, LINE_LENGTH);
+    PrintLineSmart(1, text);
+  }
 
   // Display timeout
-  if (!isOff && (varDisplayTimeout.value > 0) && (millis() / 1000 > lastOnTime + varDisplayTimeout.value))
+  if (!isOff && (varDisplayTimeout.value > 0) && (t/1000 > lastOnTime + varDisplayTimeout.value))
     Off(isOLED);
 }
 
@@ -222,12 +290,152 @@ void  CDisplay::Update()
 void  CDisplay::AppendWithSpaces(char * text, int len)
 {
   bool endFound = false;
-  for (int i=0; i<len; ++i)
+  for (int i=0; i<=len; ++i)
   {
     if (text[i] == 0) endFound = true;
     if (endFound)     text[i] = ' ';
   }
   text[len] = 0;
+}
+
+//------------------------------------------------------------------------------------------
+
+void  CDisplay::SetGraphCursor(int x, int y)
+{
+  if (0 <= x && x <= 99)
+    lcd.command(LCD_SETDDRAMADDR | x);
+  if (0 <= y && y <= 1)
+    lcd.command(LCD_SETCGRAMADDR | y);
+}
+
+//------------------------------------------------------------------------------------------
+
+void  CDisplay::SetTextCursor(int x, int y)
+{
+#ifdef GRAPHICS_MODE
+  SetGraphCursor(x * 6, y);
+#else
+  lcd.setCursor(x, y);
+#endif
+}
+
+//------------------------------------------------------------------------------------------
+
+int   CDisplay::GetCharIndex(uint8_t c)
+{
+  if (c == BAR[0]) return -2;
+  if (c < 0x21 || c > 0x85) return -1;
+  return c - 0x21;
+}
+
+//------------------------------------------------------------------------------------------
+
+void  CDisplay::PrintChar(int x, int y, char c)
+{
+#ifdef GRAPHICS_MODE
+  if (x < 0 || x > 99-6) return;
+
+  uint8_t b;
+  int xx = x;
+  int ind = GetCharIndex(c);
+  if (ind < 0)
+  {
+    // unprintable character or bar
+    b = (ind == -1) ? 0 : 255;
+    
+    for (int col=0; col<6; ++col)
+    {
+      lcd.command(LCD_SETDDRAMADDR | xx);
+      lcd.write(b);
+      ++xx;
+    }
+  }
+  else
+  {
+    // copy 5 columns from font
+    for (int col=0; col<5; ++col)
+    {
+      lcd.command(LCD_SETDDRAMADDR | xx);
+      b = pgm_read_byte(&Font[0] + ind * 5 + col);
+      lcd.write(b);
+      ++xx;
+    }
+    // zero out 6th column
+    lcd.command(LCD_SETDDRAMADDR | xx);
+    lcd.write((uint8_t)0);
+  }
+#endif
+}
+
+//------------------------------------------------------------------------------------------
+
+void  CDisplay::PrintText(int x, int y, const char * text)
+{
+#ifdef GRAPHICS_MODE
+
+  if (y < 0 || y > 2) return;
+  lcd.command(LCD_SETCGRAMADDR | y);
+  
+  int xx = x * 6 + saverShiftX;
+  int i = 0;
+
+  while (text[i])
+  {
+    PrintChar(xx, y, text[i]);
+    xx += 6;
+    i++;
+  }
+
+#else
+
+  lcd.setCursor(x, y);
+  lcd.print(text);
+
+#endif
+}
+
+//------------------------------------------------------------------------------------------
+
+void  CDisplay::PrintLineSmart(int y, const char * text)
+{
+#ifdef GRAPHICS_MODE
+
+  if (y < 0 || y > 2) return;
+  lcd.command(LCD_SETCGRAMADDR | y);
+  
+  int xx = saverShiftX;
+  int i = 0;
+
+  while (text[i])
+  {
+    if (text[i] != memLine[y][i])
+      PrintChar(saverShiftX + 6 * i, y, text[i]);
+    i++;
+  }
+
+  memcpy(memLine[y], text, 16);
+
+#else
+
+  PrintText(0, y, text);
+
+#endif
+}
+
+//------------------------------------------------------------------------------------------
+
+void  CDisplay::Test()
+{
+/*#ifdef GRAPHICS_MODE
+
+  SetGraphCursor(testPos % 100, (testPos / 100) % 2);
+  lcd.write(testPos < 200 ? 255 : 0);
+  if (testPos++ >= 400) testPos = 0;
+
+#else*/
+
+  PrintText(testPos % 16, (testPos / 16) % 2, testPos < 16*2 ? BAR : " ");
+  if (testPos++ >= 16*4) testPos = 0;
 }
 
 //------------------------------------------------------------------------------------------

@@ -1,10 +1,11 @@
 #define NANO
 //------------------------------------------------------------------------------------------
-//#define DEBUG
-//#define USE_DHT
-//#define RUSSIAN
+//#define DEBUG         // output debug info to Serial Monitor
+#define GRAPHICS_MODE // use graphics Winstar display
+//#define USE_DHT     // use DHT sensor
+//#define RUSSIAN     // use Russian language
 //------------------------------------------------------------------------------------------
-#define LINE_LENGTH             16
+#define LINE_LENGTH             16    // number of symbols in line
 //------------------------------------------------------------------------------------------
 // All times in milliseconds
 #define POWER_DETECT_PERIOD     5     // period to measure power voltage and detect power loss
@@ -18,6 +19,7 @@
 #define MSG_LONG_TIME           2000  // long message ("fans enabled/disbled") display time
 #define MSG_BLINK_HALFPERIOD    500   // half of message blinking period
 #define EEPROM_WRITE_WAIT_TIME  10000 // delay between writes to EEPROM memory
+#define OLED_SCREEN_SAVER       10000 // period of random shif of image on graphics Winstar OLED
 //------------------------------------------------------------------------------------------
 
 
@@ -74,6 +76,7 @@
 #include "settings.h"
 #include "state.h"
 #include "fans.h"
+#include "font.h"
 #include "display.h"
 #include "keys.h"
 #include "menu.h"
@@ -97,6 +100,10 @@ void setup()
   fans.Init();
   display.Init();
   temp.Init();
+
+#ifdef DEBUG
+  Serial.println(F("Running..."));
+#endif
 }
 
 //------------------------------------------------------------------------------------------

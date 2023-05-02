@@ -216,9 +216,7 @@ const char * CMenu::GetLine0()
 {
   uint32_t t = millis();
 
-  if (isDisplayTest())
-    return LoadMessage(TXT_TEST_BARS);
-  else if (inMenu)
+  if (inMenu)
   {
     const CMenuNode & n = node[menuPos];
   
@@ -258,9 +256,7 @@ const char * CMenu::GetLine1()
 {
   uint32_t t = millis();
 
-  if (isDisplayTest())
-    return LoadMessage(TXT_TEST_BARS);
-  else if (inMenu)
+  if (inMenu)
   {
     const CMenuNode & n = node[menuPos];
   
