@@ -3,9 +3,6 @@
 //------------------------------------------------------------------------------------------
 CDisplay display;
 //------------------------------------------------------------------------------------------
-
-
-//------------------------------------------------------------------------------------------
 #ifndef GRAPHICS_MODE
 
 uint8_t CDisplay::CustomChars[][8] =
@@ -19,61 +16,9 @@ uint8_t CDisplay::CustomChars[][8] =
   {B00000,B01100,B00101,B11111,B10100,B00110,B00000,B00000}, // symbol "Fan 1"
   {B00000,B00010,B11010,B00100,B01011,B01000,B00000,B00000}, // symbol "Fan 2"
   {B00000,B11001,B01011,B00100,B11010,B10011,B00000,B00000}, // symbol "Fan 3"
-#ifdef RUSSIAN
-  {B11110,B10000,B10000,B11110,B10001,B10001,B11110,B00000}, // symbol "Б"
-  {B11111,B10001,B10000,B10000,B10000,B10000,B10000,B00000}, // symbol "Г"
-  {B01111,B00101,B00101,B01001,B10001,B11111,B10001,B00000}, // symbol "Д"
-  {B10101,B10101,B10101,B11111,B10101,B10101,B10101,B00000}, // symbol "Ж"
-  {B01110,B10001,B00001,B00010,B00001,B10001,B01110,B00000}, // symbol "З"
-  {B10001,B10011,B10011,B10101,B11001,B11001,B10001,B00000}, // symbol "И"
-  {B01110,B00000,B10001,B10011,B10101,B11001,B10001,B00000}, // symbol "Й"
-  {B00011,B00111,B00101,B00101,B01101,B01001,B11001,B00000}, // symbol "Л"
-  {B11111,B10001,B10001,B10001,B10001,B10001,B10001,B00000}, // symbol "П"
-  {B10001,B10001,B10001,B01010,B00100,B01000,B10000,B00000}, // symbol "У"
-  {B00100,B11111,B10101,B10101,B11111,B00100,B00100,B00000}, // symbol "Ф"
-  {B10010,B10010,B10010,B10010,B10010,B10010,B11111,B00001}, // symbol "Ц"
-  {B10001,B10001,B10001,B01111,B00001,B00001,B00001,B00000}, // symbol "Ч"
-  {B10101,B10101,B10101,B10101,B10101,B10101,B11111,B00000}, // symbol "Ш"
-  {B10101,B10101,B10101,B10101,B10101,B10101,B11111,B00001}, // symbol "Щ"
-  {B10000,B10000,B10000,B11110,B10001,B10001,B11110,B00000}, // symbol "Ь"
-  {B10001,B10001,B10001,B11001,B10101,B10101,B11001,B00000}, // symbol "Ы"
-  {B10010,B10101,B10101,B11101,B10101,B10101,B10010,B00000}, // symbol "Ю"
-  {B01111,B10001,B10001,B01111,B00101,B01001,B10001,B00000}, // symbol "Я"
-#endif
 };
 
 #endif // GRAPHICS_MODE
-
-//------------------------------------------------------------------------------------------
-
-
-
-
-//------------------------------------------------------------------------------------------
-char mesBuffer [LINE_LENGTH+1];
-char mesBuffer2[LINE_LENGTH+1];
-//------------------------------------------------------------------------------------------
-
-const char * LoadMessage(CTextMessageId n)
-{
-  strcpy_P(mesBuffer, (char*)pgm_read_word(&(mes_table[n])));
-  mesBuffer[LINE_LENGTH] = 0; // protection
-  return mesBuffer;
-}
-
-//------------------------------------------------------------------------------------------
-
-const char * LoadMessage2(CTextMessageId n)
-{
-  strcpy_P(mesBuffer2, (char*)pgm_read_word(&(mes_table[n])));
-  mesBuffer2[LINE_LENGTH] = 0; // protection
-  return mesBuffer2;
-}
-
-//------------------------------------------------------------------------------------------
-
-
-
 
 //------------------------------------------------------------------------------------------
 
@@ -159,7 +104,18 @@ void  CDisplay::Init()
   lcd.createChar((byte)FAN3 [0], CustomChars[5]); // FAN3,  code == 6
 #endif
 
+#ifdef GRAPHICS_MODE
+  saverShiftX = 4;
+  saverShiftY = 0;
+#endif
+
   PrintText(0, 0, LoadMessage(TXT_LOGO));
+
+#ifdef GRAPHICS_MODE
+  // Hack to print next line with 4 pixel offset in graphics mode
+  saverShiftX = 0;
+#endif
+
   PrintText(4, 1, LoadMessage(isOLED ? TXT_VER_OLED : TXT_VER_LCD));
 
 #ifdef DEBUG
@@ -168,6 +124,15 @@ void  CDisplay::Init()
 
   // Set display contrast/brightness (variables must be already initialized from EEPROM)
   SetBrightAndContrast();
+
+  Clear(false);
+
+#ifdef GRAPHICS_MODE
+  randomSeed(13673);
+  saverShiftX = random(4);
+  saverShiftY = random(2);
+#endif
+
 }
 
 //------------------------------------------------------------------------------------------
@@ -203,12 +168,31 @@ void  CDisplay::Off(bool hard)
 
 //------------------------------------------------------------------------------------------
 
-void  CDisplay::Clear()
+void  CDisplay::Clear(bool clearScreen)
 {
-  lcd.command(0x01); // clean RAM
+#ifdef GRAPHICS_MODE
 
+  if (clearScreen)
+  {
+    // This command makes bug - first row is not displayed after using it
+    //lcd.command(0x01); // clean RAM
+  
+    // So clear screen by simply writing zeroes to it
+    for (int y=0; y<2; ++y)
+    {
+      lcd.command(LCD_SETCGRAMADDR | y);
+      for (int x=0; x<100; ++x)
+      {
+        lcd.command(LCD_SETDDRAMADDR | x);
+        lcd.write((char)0);
+      }
+    }
+  }
+
+  // Clear mem lines
   for (int i=0; i<2; ++i)
       memset(memLine[i], 0, 17);
+#endif
 }
 
 //------------------------------------------------------------------------------------------
@@ -248,27 +232,33 @@ void  CDisplay::Update()
   uint32_t t = millis();
 
 #ifdef GRAPHICS_MODE
-  // Screensaver for graphics Winstar OLDE
-  if (!isOff && (t > lastSaverTime + OLED_SCREEN_SAVER))
+  // Screensaver for graphics Winstar OLED
+  /*if (!isOff && (t > lastSaverTime + OLED_SCREEN_SAVER))
   {
       lastSaverTime = t;
       saverShiftX = random(4);
       saverShiftY = random(2);
       Clear();
-
-#ifdef DEBUG
-      sprintf(text, "Saver x = %i, y = %i", saverShiftX, saverShiftY);
-      Serial.println(text);
-#endif
-  }
+  }*/
 #endif
 
   SetBrightAndContrast();
 
   if (menu.isDisplayTest())
+  {
+    if (!isTest)
+      testPos = 0;
+    isTest = true;
     Test();
+  }
   else
   {
+    if (isTest)
+    {
+      isTest = false;
+      Clear(true);
+    }
+
     // Print line 0
     strcpy(text, menu.GetLine0());
     AppendWithSpaces(text, LINE_LENGTH);
@@ -324,8 +314,11 @@ void  CDisplay::SetTextCursor(int x, int y)
 int   CDisplay::GetCharIndex(uint8_t c)
 {
   if (c == BAR[0]) return -2;
-  if (c < 0x21 || c > 0x85) return -1;
-  return c - 0x21;
+  if (c >= 0x21 && c <= 0x85) return c - 0x21; // digits, English letters, special symbols
+#if defined(BI_LANG) && defined(GRAPHICS_MODE)
+  if (c >= 0xC0) return c - 0xC0 + RUS_CHARS_OFFSET; // Russian letters
+#endif
+  return -1;
 }
 
 //------------------------------------------------------------------------------------------
@@ -426,16 +419,21 @@ void  CDisplay::PrintLineSmart(int y, const char * text)
 
 void  CDisplay::Test()
 {
-/*#ifdef GRAPHICS_MODE
+#ifdef GRAPHICS_MODE
 
-  SetGraphCursor(testPos % 100, (testPos / 100) % 2);
-  lcd.write(testPos < 200 ? 255 : 0);
-  if (testPos++ >= 400) testPos = 0;
+  for (int i=0; i<10; ++i)
+  {
+    SetGraphCursor(testPos % 100, (testPos / 100) % 2);
+    lcd.write(testPos < 200 ? 255 : 0);
+    if (testPos++ >= 400) testPos = 0;
+  }
 
-#else*/
+#else
 
   PrintText(testPos % 16, (testPos / 16) % 2, testPos < 16*2 ? BAR : " ");
   if (testPos++ >= 16*4) testPos = 0;
+
+#endif
 }
 
 //------------------------------------------------------------------------------------------

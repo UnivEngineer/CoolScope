@@ -2,7 +2,7 @@
 // Utilitary functions and global variables
 //------------------------------------------------------------------------------------------
 #ifdef DEBUG
-char    text[128];
+char    text[64];
 #else
 char    text[32];
 #endif
@@ -19,7 +19,7 @@ CVariable varCoolingSpeed  (       100,         10,       100,    5,   1,     "%
 CVariable varKeepingSpeed  (        20,          0,       100,    5,   1,     "%",  V_NONE,             "");    // keeping temperature fan speed duty
 CVariable varDisplayBright (         1,          1,        10,    1,   1,      "",  V_NONE,             "");    // display drightness
 CVariable varDisplayContr  (         1,          1,        10,    1,   1,      "",  V_NONE,             "");    // display contrast
-CVariable varDisplayTimeout(        30,          0,       120,    5,   1,  " sec",       0,     "Disabled");    // display off timeout in seconds (0 for disabled)
+CVariable varDisplayTimeout(        30,          0,       120,    5,   1,  " sec",       0,            "-");    // display off timeout in seconds (0 for disabled)
 CVariable varFanStuckAlarm (         1,          0,         1,    1,   1,      "",  V_BOOL,             "");    // fan stuck alarm on/off
 CVariable varLowBattAlarm  (         1,          0,         1,    1,   1,      "",  V_BOOL,             "");    // low battery alarm on/off
 CVariable varBattAlarmVolt (       100,         80,       120,    1,  10,    " V",  V_NONE,             "");    // low battery alarm threshold (divider = 10)
@@ -28,6 +28,9 @@ CVariable varSensor0Index  (         0,          0,         0,    0,   0,      "
 CVariable varSensor1Index  (         0,          0,         0,    0,   0,      "",  V_ADDR,             "");
 CVariable varSensor2Index  (         0,          0,         0,    0,   0,      "",  V_ADDR,             "");
 CVariable varSensor3Index  (         0,          0,         0,    0,   0,      "",  V_ADDR,             "");
+#ifdef BI_LANG
+CVariable varDisplayLang   (         0,          0,         1,    1,   1,      "",  V_BOOL,             "");    // language
+#endif
 //------------------------------------------------------------------------------------------
 
 
@@ -190,7 +193,7 @@ const char * CVariable::getValueStr()
     return textSpecial;
   else if (valueSpecial == V_BOOL)
   {
-    return (value == 1) ? "On" : "Off";
+    return (value == 1) ? LoadMessage(TXT_ON) : LoadMessage(TXT_OFF);
   }
   else
   {

@@ -27,6 +27,9 @@ enum  CMenuNodeID
   MENU_DISP_BRIGHT,
   MENU_DISP_CONTRAST,
   MENU_DISP_TIMEOUT,
+#ifdef BI_LANG
+  MENU_DISP_LANGUAGE,
+#endif
   MENU_DISP_TEST,
 
   MENU_INFO_TIME,
@@ -97,6 +100,7 @@ const char * GetCoolingModeStr();
 const char * GetTimeStr();
 const char * GetVoltageStr();
 const char * GetAboutStr();
+const char * GetLanguageStr();
 const char * GetSensorPairStr();
 //------------------------------------------------------------------------------------------
 #endif // MENU_H

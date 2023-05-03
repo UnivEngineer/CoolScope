@@ -34,8 +34,14 @@ CMenuNode CMenu::node[] =
 
   { TXT_DISPLAY_BRIGHT,   MENU_MAIN_DISPLAY, MENU_DISP_CONTRAST, MENU_DISP_TEST,       -1,             &varDisplayBright,  NULL },
   { TXT_DISPLAY_CONTRAST, MENU_MAIN_DISPLAY, MENU_DISP_TIMEOUT,  MENU_DISP_BRIGHT,     -1,             &varDisplayContr,   NULL },
+#ifdef BI_LANG
+  { TXT_DISPLAY_TIMEOUT,  MENU_MAIN_DISPLAY, MENU_DISP_LANGUAGE, MENU_DISP_CONTRAST,   -1,             &varDisplayTimeout, NULL },
+  { TXT_DISPLAY_LANGUAGE, MENU_MAIN_DISPLAY, MENU_DISP_TEST,     MENU_DISP_TIMEOUT,    -1,             &varDisplayLang,    &GetLanguageStr },
+  { TXT_DISPLAY_TEST,     MENU_MAIN_DISPLAY, MENU_DISP_BRIGHT,   MENU_DISP_LANGUAGE,   -1,             NULL,               NULL },
+#else
   { TXT_DISPLAY_TIMEOUT,  MENU_MAIN_DISPLAY, MENU_DISP_TEST,     MENU_DISP_CONTRAST,   -1,             &varDisplayTimeout, NULL },
   { TXT_DISPLAY_TEST,     MENU_MAIN_DISPLAY, MENU_DISP_BRIGHT,   MENU_DISP_TIMEOUT,    -1,             NULL,               NULL },
+#endif
 
   // Info submenu
 
@@ -359,6 +365,19 @@ const char * GetVoltageStr()
 const char * GetAboutStr()
 {
   return LoadMessage2(TXT_COPYRIGHT);
+}
+
+//------------------------------------------------------------------------------------------
+
+const char * GetLanguageStr()
+{
+#ifdef BI_LANG
+  switch (varDisplayLang.value)
+  {
+    case 0:     return LoadMessage(TXT_LANGUAGE_ENG);
+    default:    return LoadMessage(TXT_LANGUAGE_RUS);
+  }  
+#endif
 }
 
 //------------------------------------------------------------------------------------------

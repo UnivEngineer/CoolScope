@@ -1,9 +1,11 @@
 #define NANO
 //------------------------------------------------------------------------------------------
+#define VERSION "v 1.3"  // version string
+//------------------------------------------------------------------------------------------
+//#define GRAPHICS_MODE // use graphics Winstar display
+//#define BI_LANG       // use second language, supported only in graphics mode
 //#define DEBUG         // output debug info to Serial Monitor
-#define GRAPHICS_MODE // use graphics Winstar display
-//#define USE_DHT     // use DHT sensor
-//#define RUSSIAN     // use Russian language
+//#define USE_DHT       // use DHT sensor
 //------------------------------------------------------------------------------------------
 #define LINE_LENGTH             16    // number of symbols in line
 //------------------------------------------------------------------------------------------
@@ -77,6 +79,7 @@
 #include "state.h"
 #include "fans.h"
 #include "font.h"
+#include "locale.h"
 #include "display.h"
 #include "keys.h"
 #include "menu.h"

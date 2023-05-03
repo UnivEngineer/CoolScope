@@ -4,7 +4,7 @@
 // Utilitary functions and global variables
 //------------------------------------------------------------------------------------------
 #ifdef DEBUG
-extern  char    text[128];
+extern  char    text[64];
 #else
 extern  char    text[32];
 #endif
@@ -110,6 +110,9 @@ extern  CVariable varSensor0Index;
 extern  CVariable varSensor1Index;
 extern  CVariable varSensor2Index;
 extern  CVariable varSensor3Index;
+#ifdef BI_LANG
+extern  CVariable varDisplayLang;
+#endif
 //------------------------------------------------------------------------------------------
 int   clampi(int   x, int   a, int   b) { return x<a ? a : (x>b ? b : x); }
 float clampf(float x, float a, float b) { return x<a ? a : (x>b ? b : x); }
