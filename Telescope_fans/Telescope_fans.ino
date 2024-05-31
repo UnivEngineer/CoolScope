@@ -1,10 +1,10 @@
 #define NANO
 //------------------------------------------------------------------------------------------
-#define VERSION "v 1.3"  // version string
+#define VERSION "v 1.4"  // version string
 //------------------------------------------------------------------------------------------
-//#define GRAPHICS_MODE // use graphics Winstar display
-//#define BI_LANG       // use second language, supported only in graphics mode
-//#define DEBUG         // output debug info to Serial Monitor
+#define GRAPHICS_MODE // use graphics Winstar display
+#define BI_LANG       // use second language, supported only in graphics mode
+#define DEBUG         // output debug info to Serial Monitor
 //#define USE_DHT       // use DHT sensor
 //------------------------------------------------------------------------------------------
 #define LINE_LENGTH             16    // number of symbols in line

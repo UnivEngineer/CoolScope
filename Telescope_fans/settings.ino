@@ -190,6 +190,11 @@ void    CSettings::Update(int NumCycles)
   voltageAvg = voltageSum / NumCycles;
   voltageSum = 0.0f;
 
+//#ifdef DEBUG
+//      Serial.print(F("Power voltage = "));
+//      Serial.println(voltageAvg);
+//#endif
+
   // Switch off onboard LED if it was turned on
   if (digitalRead(BOARD_LED_PIN) == HIGH)
     digitalWrite(BOARD_LED_PIN, LOW);

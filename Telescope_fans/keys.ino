@@ -93,6 +93,13 @@ void  CKeyboard::update()
 {
   for (int i=0; i<BT_COUNT; ++i)
     Button[i].update();
+
+#ifdef DEBUG
+  //Serial.print(F("[ "));
+  //for (int i=0; i<BT_COUNT; ++i)
+  //    Serial.print(Button[i].isClick() ? 1 : 0);
+  //Serial.println(F("]"));
+#endif
 }
 
 //------------------------------------------------------------------------------------------

@@ -38,7 +38,7 @@ void  CTempSensors::Update()
   {
 #ifdef USE_DHT
     // Reading temperature or humidity takes about 250 milliseconds!
-    // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
+    // Sensor readings may also be up to 2 seconds 'old' (it is a very slow sensor)
     state.humidity  = dht.readHumidity();
     state.tempBoard = dht.readTemperature();
 #endif
@@ -52,6 +52,13 @@ void  CTempSensors::Update()
 
     lastTempReadTime = t;
   }
+}
+
+//------------------------------------------------------------------------------------------
+
+void  CTempSensors::AssignNoAddress(byte * addr)
+{
+    memset(addr, 0xff, ADDR_SIZE);  // assign "non assigned" value
 }
 
 //------------------------------------------------------------------------------------------
@@ -130,6 +137,8 @@ void  CTempSensors::GetNextAddress(byte * addr)
 
   if ((nextIndex >= 0) && (nextIndex < S_COUNT))
     memcpy(addr, b, sizeof(b));
+  else
+    AssignNoAddress(addr);
 }
 
 //------------------------------------------------------------------------------------------
@@ -147,9 +156,9 @@ void  CTempSensors::GetPrevAddress(byte * addr)
 
   int  index = 0;
   int  prevIndex = -1000;
-  byte b[8], m[8];
-  memset(b, 0, sizeof(b));
-  memset(m, 0, sizeof(m));
+  byte b[ADDR_SIZE], m[ADDR_SIZE];
+  memset(b, 0, ADDR_SIZE);
+  memset(m, 0, ADDR_SIZE);
 
   while (ds.search(b))
   {
@@ -170,7 +179,7 @@ void  CTempSensors::GetPrevAddress(byte * addr)
       break;
     }
 
-    memcpy(m, b, sizeof(b));
+    memcpy(m, b, ADDR_SIZE);
 
     ++index;
   }
@@ -188,10 +197,12 @@ void  CTempSensors::GetPrevAddress(byte * addr)
   ds.reset_search();
 
   if (prevIndex == -1)
-    memset(addr, 0xff, sizeof(m));  // assign "non assigned" value
+    AssignNoAddress(addr);
 
   if ((prevIndex >= 0) && (prevIndex < S_COUNT))
-    memcpy(addr, m, sizeof(m));
+    memcpy(addr, m, ADDR_SIZE);
+  else
+    AssignNoAddress(addr);
 }
 
 //------------------------------------------------------------------------------------------
@@ -210,7 +221,7 @@ float CTempSensors::ReadTempSensor(byte * addr)
     return NO_TEMP;
   }
   
-  // Read temperature from PREVIOUS conversion command
+  // Read temperature from the PREVIOUS conversion command
 
   byte present = ds.reset();
   ds.select(addr);  
@@ -224,14 +235,14 @@ float CTempSensors::ReadTempSensor(byte * addr)
   if (dataCRC != data[8])
   {
     #ifdef DEBUG
-      AddressToHexStr(addr, text);
+      /*AddressToHexStr(addr, text);
       Serial.print(F("Device "));
       Serial.print(text);
       Serial.print(F(": invalid data CRC (computed = "));
       Serial.print(dataCRC);
       Serial.print(F(", read = "));
       Serial.print(data[8]);
-      Serial.println(")");
+      Serial.println(")");*/
     #endif
     return NO_TEMP;
   }

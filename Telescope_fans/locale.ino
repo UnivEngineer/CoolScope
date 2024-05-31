@@ -13,6 +13,12 @@ const char * LoadMessage(CTextMessageId n)
     strcpy_P(mesBuffer, (char*)pgm_read_word(&(mes_table[n])));
 
   mesBuffer[LINE_LENGTH] = 0; // protection
+
+#ifdef DEBUG
+  //Serial.print(F("LoadMessage: "));
+  //Serial.println(mesBuffer);
+#endif 
+ 
   return mesBuffer;
 }
 
@@ -28,6 +34,12 @@ const char * LoadMessage2(CTextMessageId n)
     strcpy_P(mesBuffer2, (char*)pgm_read_word(&(mes_table[n])));
 
   mesBuffer2[LINE_LENGTH] = 0; // protection
+
+#ifdef DEBUG
+  //Serial.print(F("LoadMessage2: "));
+  //Serial.println(mesBuffer2);
+#endif 
+
   return mesBuffer2;
 }
 

@@ -352,7 +352,7 @@ const char * GetTimeStr()
 const char * GetVoltageStr()
 {
   if (settings.isPoweredByUSB())
-    return LoadMessage2(TXT_POWERED_BY_USB);
+    return LoadMessage(TXT_POWERED_BY_USB);
   else
   {
     sprintf(text, "%4.2f V", settings.GetVoltage());
@@ -364,7 +364,7 @@ const char * GetVoltageStr()
 
 const char * GetAboutStr()
 {
-  return LoadMessage2(TXT_COPYRIGHT);
+  return LoadMessage(TXT_COPYRIGHT);
 }
 
 //------------------------------------------------------------------------------------------
