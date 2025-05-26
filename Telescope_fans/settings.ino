@@ -6,7 +6,7 @@ CSettings settings;
 #define RESISTOR_TO_PWR     46.9f // 44.3f // power voltage measurement divider R1, kOhms
 #define RESISTOR_TO_GND     20.1f // 17.9f // power voltage measurement divider R2, kOhms
 #define ADC_TO_VOLTS        (5.0f / 1023.0f * (RESISTOR_TO_PWR + RESISTOR_TO_GND) / RESISTOR_TO_GND)
-#define POWER_USB_VOLTS     5.0f  // power voltage, considered as powered by USB
+#define POWER_USB_VOLTS     5.0f  // power voltage considered as "powered by USB"
 //------------------------------------------------------------------------------------------
 
 

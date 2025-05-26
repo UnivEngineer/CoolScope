@@ -12,18 +12,19 @@ CMenuNode CMenu::node[] =
 
   // Main menu
 
-  { TXT_COOLING,          MENU_ROOT,         MENU_MAIN_SENSORS,  MENU_MAIN_INFO,    MENU_COOL_ENABLED, NULL,               NULL },
+  { TXT_COOLING,          MENU_ROOT,         MENU_MAIN_SENSORS,  MENU_MAIN_INFO,    MENU_FANS_ENABLED, NULL,               NULL },
   { TXT_SENSORS,          MENU_ROOT,         MENU_MAIN_DISPLAY,  MENU_MAIN_COOLING, MENU_SENS_DT_PAIR, NULL,               NULL },
   { TXT_DISPLAY,          MENU_ROOT,         MENU_MAIN_INFO,     MENU_MAIN_SENSORS, MENU_DISP_BRIGHT,  NULL,               NULL },
   { TXT_INFORMATION,      MENU_ROOT,         MENU_MAIN_COOLING,  MENU_MAIN_DISPLAY, MENU_INFO_TIME,    NULL,               NULL },
 
   // Cooling submenu
 
-  { TXT_FANS_ENABLED,     MENU_MAIN_COOLING, MENU_COOL_MODE,     MENU_KEEP_SPEED,      -1,             &varCoolingEnabled, NULL },
-  { TXT_MODE_ONCE_COOLED, MENU_MAIN_COOLING, MENU_TARGET_DT,     MENU_COOL_ENABLED,    -1,             &varCoolingMode,    &GetCoolingModeStr },
+  { TXT_FANS_ENABLED,     MENU_MAIN_COOLING, MENU_COOL_MODE,     MENU_POS_PRESSURE,    -1,             &varCoolingEnabled, NULL },
+  { TXT_MODE_ONCE_COOLED, MENU_MAIN_COOLING, MENU_TARGET_DT,     MENU_FANS_ENABLED,    -1,             &varCoolingMode,    &GetCoolingModeStr },
   { TXT_TARGET_DT,        MENU_MAIN_COOLING, MENU_COOL_SPDED,    MENU_COOL_MODE,       -1,             &varTargetDeltaT,   NULL },
   { TXT_COOLING_SPEED,    MENU_MAIN_COOLING, MENU_KEEP_SPEED,    MENU_TARGET_DT,       -1,             &varCoolingSpeed,   NULL },
-  { TXT_KEEPING_SPEED,    MENU_MAIN_COOLING, MENU_COOL_ENABLED,  MENU_COOL_SPDED,      -1,             &varKeepingSpeed,   NULL },
+  { TXT_KEEPING_SPEED,    MENU_MAIN_COOLING, MENU_POS_PRESSURE,  MENU_COOL_SPDED,      -1,             &varKeepingSpeed,   NULL },
+  { TXT_POS_PRESSURE,     MENU_MAIN_COOLING, MENU_FANS_ENABLED,  MENU_KEEP_SPEED,      -1,             &varPosPressure,    NULL },
 
   // Sensors submenu
 

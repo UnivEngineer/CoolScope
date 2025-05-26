@@ -99,6 +99,7 @@ extern  CVariable varCoolingEnabled;
 extern  CVariable varTargetDeltaT;
 extern  CVariable varCoolingSpeed;
 extern  CVariable varKeepingSpeed;
+extern  CVariable varPosPressure;
 extern  CVariable varDisplayBright;
 extern  CVariable varDisplayContr;
 extern  CVariable varDisplayTimeout;

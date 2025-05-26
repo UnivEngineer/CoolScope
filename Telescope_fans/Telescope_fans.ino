@@ -1,10 +1,10 @@
 #define NANO
 //------------------------------------------------------------------------------------------
-#define VERSION "v 1.4"  // version string
+#define VERSION "v 1.5"  // version string
 //------------------------------------------------------------------------------------------
 #define GRAPHICS_MODE // use graphics Winstar display
 #define BI_LANG       // use second language, supported only in graphics mode
-#define DEBUG         // output debug info to Serial Monitor
+//#define DEBUG         // output debug info to Serial Monitor
 //#define USE_DHT       // use DHT sensor
 //------------------------------------------------------------------------------------------
 #define LINE_LENGTH             16    // number of symbols in line
@@ -29,9 +29,10 @@
 //------------------------------------------------------------------------------------------
 // Used pins
 //------------------------------------------------------------------------------------------
-// Hardware interupt pins: 2, 3
-// Hardware PWM pins:      3, 5, 6, 9, 10, 11
-// Analog-read-only pins:  A6(20), A7(21)
+// Pin name (physical pin number on Arduino Nano board)
+// Hardware interrupt pins: D2(5), D3(6)
+// Hardware PWM pins:       D3(6), D5(8), D6(9), D9(12), D10(13), D11(14)
+// Analog-read-only pins:   A6(20), A7(21)
 
 #define DHT_PIN           8   // Digital pin connected to the DHT sensor
 #define DS18B20_PIN       8   // Digital pin connected to the DS19B20 sensor(s)
@@ -47,16 +48,16 @@
 #define PWM_CONTRAST_LCD  6   // Display contrast   PWM
 
 // Digital pins for 1602 disaply
-#define LCD_D7_PIN        14  // A0=14
-#define LCD_D6_PIN        15  // A1=15
-#define LCD_D5_PIN        16  // A2=16
-#define LCD_D4_PIN        17  // A3=17
-#define LCD_E_PIN         18  // A4=18
-#define LCD_RS_PIN        19  // A5=19
+#define LCD_D7_PIN        14  // A0(14)
+#define LCD_D6_PIN        15  // A1(15)
+#define LCD_D5_PIN        16  // A2(16)
+#define LCD_D4_PIN        17  // A3(17)
+#define LCD_E_PIN         18  // A4(18)
+#define LCD_RS_PIN        19  // A5(19)
 
-#define POWER_DETECT_PIN  A6  // Power loss detection pin
+#define POWER_DETECT_PIN  A6  // A6(20) Power loss detection pin
 
-#define LCD_DETECT_PIN    A7  // Display type (LCD/OLED) jumper pin
+#define LCD_DETECT_PIN    A7  // A7(21) Display type (LCD/OLED) jumper pin
 
 #define BOARD_LED_PIN     13  // Onboard LED pin
 

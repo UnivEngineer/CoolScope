@@ -51,7 +51,8 @@ void  CFansController::Update()
     int   lerpi = clampi(int(floor(lerpf * 100.0f) + 0.5f), 0, 100);
     int   duty  = mixi(varKeepingSpeed.value, varCoolingSpeed.value, lerpi);
   
-    state.fanDuty1 = state.fanDuty2 = duty;
+    state.fanDuty1 = duty;
+    state.fanDuty2 = duty * varPosPressure.value / 100;
   
     // If target delta T reached, change fans mode
     if (lerpf <= 0.0f)

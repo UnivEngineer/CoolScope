@@ -17,6 +17,7 @@ CVariable varCoolingEnabled(         1,          0,         1,    1,   1,      "
 CVariable varTargetDeltaT  (         5,          0,        50,    1,  10, DEG "C",       0, "0.05" DEG "C");    // in millidegrees (divider = 10, special value = 0 for 0.05°C)
 CVariable varCoolingSpeed  (       100,         10,       100,    5,   1,     "%",  V_NONE,             "");    // cooling fan speed duty
 CVariable varKeepingSpeed  (        20,          0,       100,    5,   1,     "%",  V_NONE,             "");    // keeping temperature fan speed duty
+CVariable varPosPressure   (        50,          0,       100,    5,   1,     "%",  V_NONE,             "");    // intake vs exhaust fan speed duty
 CVariable varDisplayBright (         1,          1,        10,    1,   1,      "",  V_NONE,             "");    // display drightness
 CVariable varDisplayContr  (         1,          1,        10,    1,   1,      "",  V_NONE,             "");    // display contrast
 CVariable varDisplayTimeout(        30,          0,       120,    5,   1,  " sec",       0,            "-");    // display off timeout in seconds (0 for disabled)
